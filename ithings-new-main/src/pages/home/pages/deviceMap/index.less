@@ -1,0 +1,25 @@
+.map {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 确保百度地图容器正确显示 */
+:global {
+  .map .anchorBL {
+    display: none !important;
+  }
+
+  .map .BMap_cpyCtrl {
+    display: none !important;
+  }
+
+  /* 强制百度地图容器使用100%宽高 */
+  .map > div,
+  .map canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}

@@ -1,0 +1,46 @@
+services:
+  # MySQL 8.0 数据库
+  mysql:
+    image: mysql:8.0.13
+    container_name: system-template-mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root123456
+      MYSQL_DATABASE: system_template
+      TZ: Asia/Shanghai
+    volumes:
+      # 挂载 SQL 初始化文件
+      - ./system-mysql8.sql:/docker-entrypoint-initdb.d/init.sql
+      # 数据持久化
+      - mysql-data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis 6.0 缓存
+  redis:
+    image: redis:6.0.5
+    container_name: system-template-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql-data:
+  redis-data:

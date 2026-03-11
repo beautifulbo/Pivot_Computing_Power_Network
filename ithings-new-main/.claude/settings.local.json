@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(npm install)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(sshpass -p \"1234asdf\" ssh -o StrictHostKeyChecking=no ubuntu@82.157.104.186 \"uname -a && cat /etc/os-release | head -5\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"echo ''''=== 系统信息 ==='''' && uname -a && echo '''''''' && echo ''''=== OS 版本 ==='''' && cat /etc/os-release | head -5\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"echo ''=== Node.js 版本 ==='' && node --version 2>&1 || echo ''Node.js 未安装'' && echo '''' && echo ''=== Nginx 状态 ==='' && nginx -v 2>&1 || echo ''Nginx 未安装'' && echo '''' && echo ''=== 端口 8080 占用情况 ==='' && sudo netstat -tlnp | grep :8080 || echo ''端口 8080 未被占用''\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"echo ''=== 当前 Nginx 配置内容 ==='' && cat /etc/nginx/sites-available/system-template\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"echo ''=== 检查 Node.js ==='' && which node && node --version 2>&1 || echo ''node 命令不在 PATH 中'' && echo '''' && echo ''=== 检查 npm ==='' && which npm && npm --version 2>&1 || echo ''npm 命令不在 PATH 中'' && echo '''' && echo ''=== 检查 nvm ==='' && ls -la ~/.nvm 2>&1 || echo ''nvm 未安装'' && echo '''' && echo ''=== 查找所有 node 可执行文件 ==='' && sudo find /usr /opt /home -name ''node'' -type f 2>/dev/null | head -20\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"echo ''=== 创建 iThings 项目目录 ==='' && sudo mkdir -p /var/www/ithings && sudo chown -R ubuntu:ubuntu /var/www/ithings && ls -la /var/www/\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"ps aux | grep ''npm install'' | grep -v grep && echo '''' && echo ''=== node_modules 大小 ==='' && du -sh /var/www/ithings/node_modules 2>/dev/null || echo ''node_modules 还未创建或正在创建''\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"cd /var/www/ithings && ls -lah node_modules 2>/dev/null | head -5 || echo ''node_modules 不存在'' && echo '''' && echo ''=== npm 进程 ==='' && ps aux | grep npm | grep -v grep\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"kill 2265240 && echo ''已杀掉 npm install 进程'' && sleep 2 && ps aux | grep npm | grep -v grep || echo ''进程已终止''\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"ps aux | grep ''[n]pm'' || echo ''没有 npm 进程''\")",
+      "Bash(ssh ubuntu@82.157.104.186 \"cd /var/www/ithings && source ~/.nvm/nvm.sh && nvm use 18 && npm install --legacy-peer-deps && echo ''=== 依赖安装完成 ==='' && npm run build && echo ''=== 构建完成 ===''\")",
+      "Bash(scp:*)",
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(timeout /t 10)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

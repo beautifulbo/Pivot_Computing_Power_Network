@@ -1,0 +1,31 @@
+.algorithm-selection-container {
+  margin-bottom: 24px;
+
+  .algorithm-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 2px solid #d9d9d9;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-4px);
+      border-color: #2F54EB;
+    }
+
+    &.selected {
+      border-color: #2F54EB;
+      background-color: #f0f5ff;
+      box-shadow: 0 0 0 2px rgba(47, 84, 235, 0.2);
+    }
+
+    .ant-card-body {
+      padding: 24px 16px;
+    }
+  }
+
+  .algorithm-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+}

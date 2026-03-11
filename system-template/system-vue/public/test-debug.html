@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>详细调试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-info { background: #f0f9ff; padding: 15px; margin-bottom: 20px; border-left: 4px solid #409eff; }
+        .iframe-container { width: 100%; height: 600px; border: 2px solid #409eff; margin-top: 20px; }
+        iframe { width: 100%; height: 100%; border: none; }
+        #console { background: #1e1e1e; color: #d4d4d4; padding: 15px; font-family: 'Courier New', monospace; font-size: 12px; max-height: 300px; overflow-y: auto; margin-top: 20px; }
+        .log { padding: 5px 0; border-bottom: 1px solid #333; }
+        .error { color: #f48771; }
+        .success { color: #89d185; }
+        .info { color: #6bb6ff; }
+    </style>
+</head>
+<body>
+    <h1>WeBASE iframe 详细调试</h1>
+    
+    <div class="debug-info">
+        <p><strong>代理URL:</strong> /webase-proxy/</p>
+        <p><strong>当前协议:</strong> <span id="protocol"></span></p>
+        <p><strong>测试时间:</strong> <span id="time"></span></p>
+    </div>
+    
+    <div class="iframe-container">
+        <iframe id="testFrame" src="/webase-proxy/"></iframe>
+    </div>
+    
+    <h2 style="margin-top: 20px;">控制台日志</h2>
+    <div id="console"></div>
+    
+    <script>
+        const consoleDiv = document.getElementById('console');
+        const iframe = document.getElementById('testFrame');
+        
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const logDiv = document.createElement('div');
+            logDiv.className = `log ${type}`;
+            logDiv.textContent = `[${time}] ${message}`;
+            consoleDiv.appendChild(logDiv);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        // 初始化
+        document.getElementById('protocol').textContent = window.location.protocol;
+        document.getElementById('time').textContent = new Date().toLocaleString();
+        
+        log('页面加载完成', 'success');
+        log('iframe src: ' + iframe.src, 'info');
+        
+        // iframe 加载事件
+        iframe.onload = function() {
+            log('iframe onload 事件触发', 'success');
+            try {
+                // 尝试访问 iframe 内容（可能会被跨域限制）
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                log('iframe document 可访问', 'success');
+                log('iframe title: ' + iframeDoc.title, 'info');
+            } catch(e) {
+                log('无法访问 iframe 内容（跨域限制）: ' + e.message, 'error');
+            }
+        };
+        
+        iframe.onerror = function(e) {
+            log('iframe onerror 事件触发: ' + e, 'error');
+        };
+        
+        // 监听所有错误
+        window.addEventListener('error', function(e) {
+            log('页面错误: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'error');
+        }, true);
+        
+        // 监听网络错误
+        window.addEventListener('unhandledrejection', function(e) {
+            log('Promise 拒绝: ' + e.reason, 'error');
+        });
+        
+        // 定时检查 iframe 状态
+        let checkCount = 0;
+        const checkInterval = setInterval(function() {
+            checkCount++;
+            log(`检查 #${checkCount}: iframe.contentWindow = ${!!iframe.contentWindow}`, 'info');
+            
+            if (checkCount >= 10) {
+                clearInterval(checkInterval);
+                log('停止检查', 'info');
+            }
+        }, 1000);
+        
+        // 检查是否有安全策略阻止
+        fetch('/webase-proxy/')
+            .then(response => {
+                log('Fetch 成功: status = ' + response.status, 'success');
+                return response.text();
+            })
+            .then(html => {
+                log('HTML 长度: ' + html.length + ' 字符', 'info');
+                if (html.includes('WeBASE')) {
+                    log('✓ HTML 包含 WeBASE 标记', 'success');
+                }
+                if (html.includes('iframe embedding allowed')) {
+                    log('✓ Clickjacking 防护已移除', 'success');
+                }
+                if (html.includes('display: block')) {
+                    log('✓ Body 显示样式已修复', 'success');
+                }
+            })
+            .catch(err => {
+                log('Fetch 失败: ' + err, 'error');
+            });
+    </script>
+</body>
+</html>

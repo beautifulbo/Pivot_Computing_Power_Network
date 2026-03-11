@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>无 sandbox 测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #f56c6c; color: white; padding: 15px; text-align: center; }
+        .content { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .warning-box { background: #fef0f0; border-left: 4px solid #f56c6c; padding: 15px; }
+        .iframe-box { flex: 1; border: 2px solid #f56c6c; border-radius: 8px; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; display: block; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>无 Sandbox 限制测试（可能会跳转）</h1>
+    </div>
+    
+    <div class="content">
+        <div class="warning-box">
+            <p><strong>警告:</strong> 此测试不使用 sandbox，可能会导致页面跳转</p>
+            <p><strong>用途:</strong> 对比测试，确认 sandbox 是否导致加载问题</p>
+        </div>
+        
+        <div class="iframe-box">
+            <iframe src="/webase-proxy/#/login?redirect=%2Fmain"></iframe>
+        </div>
+    </div>
+    
+    <script>
+        console.log('No-sandbox test page loaded');
+    </script>
+</body>
+</html>

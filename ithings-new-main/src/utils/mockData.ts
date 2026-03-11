@@ -1,0 +1,670 @@
+// 模拟系统配置数据（包含百度地图API密钥）
+export const mockSystemConfig = {
+  code: 200,
+  msg: 'success',
+  data: {
+    map: {
+      accessKey: 'bx8OZdaX5k7YViAjlf6dQJ3W7F6fpb82', // 百度地图API密钥
+      type: 'baidu',
+    },
+  },
+};
+
+// 模拟设备统计数据
+export const mockDeviceCountData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    deviceCount: {
+      online: 19,
+      offline: 0,
+      inactive: 1,
+      unknown: 18,
+    },
+    deviceTypeCount: {
+      device: 25,
+      gateway: 8,
+      subset: 5,
+      unknown: 0,
+    },
+  },
+};
+
+// 模拟场景联动列表数据
+export const mockSceneListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        id: '1',
+        name: '温度控制场景',
+        status: 1,
+        type: 1,
+        desc: '当温度超过30度时开启空调',
+        createdTime: Date.now() - 86400000,
+      },
+      {
+        id: '2',
+        name: '湿度监控场景',
+        status: 1,
+        type: 1,
+        desc: '湿度低于40%时开启加湿器',
+        createdTime: Date.now() - 172800000,
+      },
+      {
+        id: '3',
+        name: '光照控制场景',
+        status: 0,
+        type: 2,
+        desc: '光照强度低于100时自动开灯',
+        createdTime: Date.now() - 259200000,
+      },
+    ],
+    total: 3,
+  },
+};
+
+// 模拟设备列表数据
+export const mockDeviceListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        productID: 'prod001',
+        deviceName: '01',
+        productName: '温度传感器',
+        status: 1,
+        isOnline: 1,
+        operator: '移动',
+        firstLogin: String(Date.now() - 2592000000),
+        lastLogin: String(Date.now() - 3600000),
+        createdTime: Date.now() - 2592000000,
+        version: 'v1.0.0',
+        position: { longitude: 116.4074, latitude: 39.9042 },
+        address: '北京市朝阳区',
+      },
+      {
+        productID: 'prod002',
+        deviceName: '02',
+        productName: '湿度传感器',
+        status: 1,
+        isOnline: 1,
+        operator: '移动',
+        firstLogin: String(Date.now() - 2592000000),
+        lastLogin: String(Date.now() - 7200000),
+        createdTime: Date.now() - 2592000000,
+        version: 'v1.0.1',
+        position: { longitude: 121.4737, latitude: 31.2304 },
+        address: '上海市浦东新区',
+      },
+      {
+        productID: 'prod003',
+        deviceName: '03',
+        productName: '智能开关',
+        status: 1,
+        isOnline: 2,
+        operator: '移动',
+        firstLogin: String(Date.now() - 2592000000),
+        lastLogin: String(Date.now() - 86400000),
+        createdTime: Date.now() - 2592000000,
+        version: 'v1.1.0',
+        position: { longitude: 113.2644, latitude: 23.1291 },
+        address: '广州市天河区',
+      },
+      {
+        productID: 'prod004',
+        deviceName: '04',
+        productName: '空调控制器',
+        status: 1,
+        isOnline: 1,
+        operator: '移动',
+        firstLogin: String(Date.now() - 1296000000),
+        lastLogin: String(Date.now() - 1800000),
+        createdTime: Date.now() - 1296000000,
+        version: 'v2.0.0',
+        position: { longitude: 114.0579, latitude: 22.5431 },
+        address: '深圳市南山区',
+      },
+      {
+        productID: 'prod005',
+        deviceName: '05',
+        productName: '光照传感器',
+        status: 2,
+        isOnline: 2,
+        operator: '移动',
+        firstLogin: '0',
+        lastLogin: String(Date.now() - 172800000),
+        createdTime: Date.now() - 1296000000,
+        version: 'v1.0.0',
+        position: { longitude: 120.1551, latitude: 30.2741 },
+        address: '杭州市西湖区',
+      },
+      {
+        productID: 'prod001',
+        deviceName: '06',
+        productName: '温度传感器',
+        status: 1,
+        isOnline: 1,
+        operator: '移动',
+        firstLogin: String(Date.now() - 1728000000),
+        lastLogin: String(Date.now() - 5400000),
+        createdTime: Date.now() - 1728000000,
+        version: 'v1.0.0',
+        position: { longitude: 106.5516, latitude: 29.5630 },
+        address: '重庆市渝中区',
+      },
+      {
+        productID: 'prod002',
+        deviceName: '07',
+        productName: '湿度传感器',
+        status: 1,
+        isOnline: 2,
+        operator: '移动',
+        firstLogin: String(Date.now() - 1728000000),
+        lastLogin: String(Date.now() - 43200000),
+        createdTime: Date.now() - 1728000000,
+        version: 'v1.0.1',
+        position: { longitude: 104.0657, latitude: 30.5702 },
+        address: '成都市武侯区',
+      },
+      {
+        productID: 'prod001',
+        deviceName: '08',
+        productName: '温度传感器',
+        status: 1,
+        isOnline: 1,
+        operator: '移动',
+        firstLogin: String(Date.now() - 864000000),
+        lastLogin: String(Date.now() - 7200000),
+        createdTime: Date.now() - 864000000,
+        version: 'v1.0.2',
+        position: { longitude: 108.9398, latitude: 34.3416 },
+        address: '西安市雁塔区',
+      },
+    ],
+    total: 8,
+  },
+};
+
+// 模拟产品列表数据
+export const mockProductListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        productID: 'prod001',
+        productName: '温度传感器',
+        authMode: 1,
+        deviceType: 1,
+        categoryID: 1,
+        netType: 1,
+        dataProto: 1,
+        status: 1,
+        deviceCount: 8,
+        createdTime: Date.now() - 7776000000,
+      },
+      {
+        productID: 'prod002',
+        productName: '湿度传感器',
+        authMode: 1,
+        deviceType: 1,
+        categoryID: 1,
+        netType: 1,
+        dataProto: 1,
+        status: 1,
+        deviceCount: 5,
+        createdTime: Date.now() - 7776000000,
+      },
+      {
+        productID: 'prod003',
+        productName: '智能开关',
+        authMode: 1,
+        deviceType: 1,
+        categoryID: 2,
+        netType: 2,
+        dataProto: 1,
+        status: 1,
+        deviceCount: 12,
+        createdTime: Date.now() - 5184000000,
+      },
+    ],
+    total: 3,
+  },
+};
+
+// 模拟图表数据
+export const mockChartData = {
+  code: 200,
+  msg: 'success',
+  data: [
+    { date: '2024-11-23', value: 156, type: '在线设备' },
+    { date: '2024-11-24', value: 178, type: '在线设备' },
+    { date: '2024-11-25', value: 165, type: '在线设备' },
+    { date: '2024-11-26', value: 189, type: '在线设备' },
+    { date: '2024-11-27', value: 195, type: '在线设备' },
+    { date: '2024-11-28', value: 201, type: '在线设备' },
+    { date: '2024-11-29', value: 198, type: '在线设备' },
+    { date: '2024-11-23', value: 45, type: '离线设备' },
+    { date: '2024-11-24', value: 38, type: '离线设备' },
+    { date: '2024-11-25', value: 42, type: '离线设备' },
+    { date: '2024-11-26', value: 35, type: '离线设备' },
+    { date: '2024-11-27', value: 28, type: '离线设备' },
+    { date: '2024-11-28', value: 22, type: '离线设备' },
+    { date: '2024-11-29', value: 25, type: '离线设备' },
+  ],
+};
+
+// 模拟地图设备分布数据
+export const mockMapDeviceData = {
+  code: 200,
+  msg: 'success',
+  data: [
+    { 
+      name: '北京',
+      position: { longitude: 116.4074, latitude: 39.9042 },
+      deviceCount: 25,
+      onlineCount: 19,
+    },
+    { 
+      name: '上海',
+      position: { longitude: 121.4737, latitude: 31.2304 },
+      deviceCount: 18,
+      onlineCount: 15,
+    },
+    { 
+      name: '广州',
+      position: { longitude: 113.2644, latitude: 23.1291 },
+      deviceCount: 12,
+      onlineCount: 10,
+    },
+    { 
+      name: '深圳',
+      position: { longitude: 114.0579, latitude: 22.5431 },
+      deviceCount: 20,
+      onlineCount: 18,
+    },
+    { 
+      name: '杭州',
+      position: { longitude: 120.1551, latitude: 30.2741 },
+      deviceCount: 8,
+      onlineCount: 5,
+    },
+  ],
+};
+
+// 模拟设备分组数据
+export const mockGroupListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        groupID: '1001',
+        groupName: '办公楼设备',
+        parentID: '1',
+        desc: '办公楼内的所有设备',
+        createdTime: Date.now() - 7776000000,
+        tags: [{ key: '类型', value: '办公' }],
+      },
+      {
+        groupID: '1002',
+        groupName: '生产车间设备',
+        parentID: '1',
+        desc: '生产车间的监控设备',
+        createdTime: Date.now() - 5184000000,
+        tags: [{ key: '类型', value: '生产' }],
+      },
+      {
+        groupID: '1003',
+        groupName: '仓库设备',
+        parentID: '1',
+        desc: '仓库环境监控设备',
+        createdTime: Date.now() - 2592000000,
+        tags: [{ key: '类型', value: '仓储' }],
+      },
+    ],
+    total: 3,
+    listAll: [
+      {
+        groupID: '1001',
+        groupName: '办公楼设备',
+        parentID: '1',
+        desc: '办公楼内的所有设备',
+        createdTime: Date.now() - 7776000000,
+        tags: [{ key: '类型', value: '办公' }],
+      },
+      {
+        groupID: '1002',
+        groupName: '生产车间设备',
+        parentID: '1',
+        desc: '生产车间的监控设备',
+        createdTime: Date.now() - 5184000000,
+        tags: [{ key: '类型', value: '生产' }],
+      },
+      {
+        groupID: '1003',
+        groupName: '仓库设备',
+        parentID: '1',
+        desc: '仓库环境监控设备',
+        createdTime: Date.now() - 2592000000,
+        tags: [{ key: '类型', value: '仓储' }],
+      },
+    ],
+  },
+};
+
+// 模拟用户列表数据
+export const mockUserListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        userID: '1',
+        userName: 'admin',
+        nickName: '系统管理员',
+        email: 'admin@ithings.com',
+        phone: '13800138000',
+        status: 1,
+        roleID: 1,
+        roleName: '超级管理员',
+        role: { id: 1, name: '超级管理员' },
+        createdTime: Date.now() - 31536000000,
+        lastLogin: Date.now() - 3600000,
+      },
+      {
+        userID: '2',
+        userName: 'operator',
+        nickName: '运维人员',
+        email: 'operator@ithings.com',
+        phone: '13900139000',
+        status: 1,
+        roleID: 2,
+        roleName: '运维角色',
+        role: { id: 2, name: '运维角色' },
+        createdTime: Date.now() - 15552000000,
+        lastLogin: Date.now() - 86400000,
+      },
+      {
+        userID: '3',
+        userName: 'viewer',
+        nickName: '查看用户',
+        email: 'viewer@ithings.com',
+        phone: '13700137000',
+        status: 1,
+        roleID: 3,
+        roleName: '只读角色',
+        role: { id: 3, name: '只读角色' },
+        createdTime: Date.now() - 7776000000,
+        lastLogin: Date.now() - 172800000,
+      },
+    ],
+    total: 3,
+  },
+};
+
+// 模拟角色列表数据
+export const mockRoleListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        id: 1,
+        name: '超级管理员',
+        desc: '拥有系统所有权限',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 2,
+        name: '运维角色',
+        desc: '负责设备运维和监控',
+        status: 1,
+        createdTime: Date.now() - 15552000000,
+      },
+      {
+        id: 3,
+        name: '只读角色',
+        desc: '仅可查看数据',
+        status: 1,
+        createdTime: Date.now() - 7776000000,
+      },
+    ],
+    total: 3,
+  },
+};
+
+// 模拟菜单列表数据
+export const mockMenuListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        id: 1,
+        name: '首页',
+        path: '/home',
+        component: 'pages/home/index',
+        type: 1,
+        order: 1,
+        parentID: 0,
+        icon: 'icon_menu_01',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 2,
+        name: '设备管理',
+        path: '/deviceMangers',
+        component: '',
+        type: 1,
+        order: 2,
+        parentID: 0,
+        icon: 'icon_data_01',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 21,
+        name: '产品',
+        path: '/deviceMangers/product/index',
+        component: 'pages/deviceMangers/product/index',
+        type: 1,
+        order: 1,
+        parentID: 2,
+        icon: '',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 22,
+        name: '设备',
+        path: '/deviceMangers/device/index',
+        component: 'pages/deviceMangers/device/index',
+        type: 1,
+        order: 2,
+        parentID: 2,
+        icon: '',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 23,
+        name: '分组',
+        path: '/deviceMangers/group/index',
+        component: 'pages/deviceMangers/group/index',
+        type: 1,
+        order: 3,
+        parentID: 2,
+        icon: '',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 3,
+        name: '系统管理',
+        path: '/systemMangers',
+        component: '',
+        type: 1,
+        order: 3,
+        parentID: 0,
+        icon: 'icon_menu_03',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 31,
+        name: '用户管理',
+        path: '/systemMangers/user/index',
+        component: 'pages/systemMangers/user/index',
+        type: 1,
+        order: 1,
+        parentID: 3,
+        icon: '',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 32,
+        name: '角色管理',
+        path: '/systemMangers/role/index',
+        component: 'pages/systemMangers/role/index',
+        type: 1,
+        order: 2,
+        parentID: 3,
+        icon: '',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 33,
+        name: '菜单管理',
+        path: '/systemMangers/menu/index',
+        component: 'pages/systemMangers/menu/index',
+        type: 1,
+        order: 3,
+        parentID: 3,
+        icon: '',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 34,
+        name: '接口管理',
+        path: '/systemMangers/api/index',
+        component: 'pages/systemMangers/api/index',
+        type: 1,
+        order: 4,
+        parentID: 3,
+        icon: '',
+        status: 1,
+        createdTime: Date.now() - 31536000000,
+      },
+    ],
+    total: 10,
+  },
+};
+
+// 模拟API列表数据
+export const mockApiListData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        id: 1,
+        route: '/api/v1/things/device/info/index',
+        method: 'POST',
+        name: '获取设备列表',
+        group: '设备管理',
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 2,
+        route: '/api/v1/things/product/info/index',
+        method: 'POST',
+        name: '获取产品列表',
+        group: '产品管理',
+        createdTime: Date.now() - 31536000000,
+      },
+      {
+        id: 3,
+        route: '/api/v1/system/user/index',
+        method: 'POST',
+        name: '获取用户列表',
+        group: '用户管理',
+        createdTime: Date.now() - 31536000000,
+      },
+    ],
+    total: 3,
+  },
+};
+
+// 模拟日志数据
+export const mockLogData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    list: [
+      {
+        id: 1,
+        userName: 'admin',
+        ip: '192.168.1.100',
+        loginTime: Date.now() - 3600000,
+        status: 1,
+      },
+      {
+        id: 2,
+        userName: 'operator',
+        ip: '192.168.1.101',
+        loginTime: Date.now() - 86400000,
+        status: 1,
+      },
+    ],
+    total: 2,
+  },
+};
+
+// 模拟设备详情数据
+export const mockDeviceDetailData = {
+  code: 200,
+  msg: 'success',
+  data: {
+    productID: '27BepjVl73q',
+    deviceName: '123',
+    deviceAlias: '测试设备',
+    secret: 'abc123def456',
+    cert: '',
+    imei: '862547054123456',
+    mac: '00:11:22:33:44:55',
+    version: 'v1.2.3',
+    hardInfo: 'STM32F103',
+    softInfo: 'v2.1.0',
+    position: {
+      longitude: 116.4074,
+      latitude: 39.9042,
+    },
+    address: '北京市朝阳区',
+    tags: [
+      { key: '部门', value: '技术部' },
+      { key: '位置', value: '办公楼' },
+    ],
+    isOnline: 1,
+    firstLogin: String(Date.now() - 2592000000),
+    lastLogin: String(Date.now() - 3600000),
+    logLevel: 4,
+    createdTime: String(Date.now() - 7776000000),
+    deviceStatus: '离线',
+    mobileOperator: 1, // 1=移动
+    phone: '13800138000',
+    iccid: '89860112345678901234',
+    userID: 'user001',
+    projectID: 'proj001',
+    areaID: 'area001',
+  },
+};
+

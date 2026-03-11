@@ -1,0 +1,3 @@
+before change:
+"scripts":
+"start": "cross-env MOCK=none UMI_ENV=dev NODE_OPTIONS=--openssl-legacy-provider && umi dev"

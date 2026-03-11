@@ -1,0 +1,547 @@
+import React, { useCallback, useEffect, useState } from 'react'
+import { Select, Radio, Button, Form, Input,InputNumber, Tag, Tooltip } from 'antd'
+import { formLayout } from '@/config/antd'
+import { useHistory, useLocation, useParams } from 'umi'
+
+import t from '@/utils/t'
+import { HIDDENMODULES } from '@/constants/common'
+import { generateName } from '@/utils/string'
+import { OPENPAI_MAX_GPU_COUNT } from '@/constants/common'
+import { TYPES, getConfig } from '@/constants/image'
+import { randomNumber } from '@/utils/number'
+import useRequest from '@/hooks/useRequest'
+
+import ImageSelect from '@/components/form/ImageSelect'
+import ModelSelect from '@/components/form/modelSelect'
+import CheckProjectDirty from '@/components/common/CheckProjectDirty'
+import LiveCodeForm from '@/components/form/items/liveCode'
+import { removeLiveCodeConfig } from '@/components/form/items/liveCodeConfig'
+import DockerConfigForm from '@/components/form/items/DockerConfig'
+import OpenpaiForm from '@/components/form/items/openpai'
+import DatasetSelect from '@/components/form/datasetSelect'
+import Desc from '@/components/form/desc'
+import useDuplicatedCheck from '@/hooks/useDuplicatedCheck'
+import TrainFormat from './training/trainFormat'
+import SubmitButtons from './SubmitButtons'
+import useModal from '@/hooks/useModal'
+import Analysis from '@/components/dataset/Analysis'
+
+import styles from './training/training.less'
+import { BarChart2LineIcon } from '@/components/common/Icons'
+import App from '@/pages/task/visual';
+import {getpublicdataset} from '@/services/dataset'
+
+const TrainType = [
+  {
+    value: 'detection',
+    label: 'task.train.form.traintypes.detect',
+    checked: true,
+  },
+]
+
+const KeywordsMaxCount = 5
+const optimizers = ["SGD","Adam"]
+
+function Train({ query = {}, hidden, ok = () => {}, bottom }) {
+  const pageParams = useParams()
+  const pid = Number(pageParams.id)
+  const history = useHistory()
+  const location = useLocation()
+  const { mid, image, test, config, from, iterationId } = query
+  const stage = mid ? (Array.isArray(mid) ? mid : mid.split(',').map(Number)) : undefined
+  const did = Number(query.did) || undefined
+  const [selectedKeywords, setSelectedKeywords] = useState([])
+  const [trainSet, setTrainSet] = useState(null)
+  const [testSet, setTestSet] = useState(null)
+  const [publicdatasets, setSets] = useState([])
+  const [validationDataset, setValidationDataset] = useState(null)
+  const [trainDataset, setTrainDataset] = useState(null)
+  const [testingSetIds, setTestingSetIds] = useState([])
+  const [form] = Form.useForm()
+  const [seniorConfig, setSeniorConfig] = useState({})
+  const [gpu_count, setGPU] = useState(0)
+  const [projectDirty, setProjectDirty] = useState(false)
+  const [live, setLiveCode] = useState(false)
+  const [liveInitialValues, setLiveInitialValues] = useState({})
+  const [openpai, setOpenpai] = useState(false)
+  const checkDuplicated = useDuplicatedCheck(submit)
+  const { data: sys, run: getSysInfo } = useRequest('common/getSysInfo', {
+    loading: false,
+  })
+  const { data: project, run: getProject } = useRequest('project/getProject', {
+    loading: false,
+  })
+  const { data: updated, run: updateProject } = useRequest('project/updateProject')
+  const { run: getDataset } = useRequest('dataset/getDataset', {
+    loading: false,
+  })
+  const { runAsync: train } = useRequest('task/train', {
+    debounceWait: 300,
+  })
+  const [fromCopy, setFromCopy] = useState(false)
+  const [AnalysisModal, showAnalysisModal] = useModal(Analysis, {
+    width: '90%',
+    style: { paddingTop: 20 },
+  })
+
+  const selectOpenpai = Form.useWatch('openpai', form)
+  const [showConfig, setShowConfig] = useState(false)
+  const iterationContext = from === 'iteration'
+
+  const renderRadio = (types) => <Radio.Group options={types.map((type) => ({ ...type, label: t(type.label) }))} />
+
+  useEffect(async () => {
+    const result = await getpublicdataset()
+    console.log(result.data)
+    if (result) {
+      if(result.code == 0){
+        const items = result.data.items
+        setSets(items)
+      }
+      else{
+        message.warn(result.msg)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    getSysInfo()
+    getProject({ id: pid })
+  }, [])
+
+  useEffect(() => {
+    setGPU(sys?.gpu_count)
+    if (!HIDDENMODULES.OPENPAI) {
+      setOpenpai(!!sys?.openpai_enabled)
+    }
+  }, [sys])
+
+  useEffect(() => {
+    setGPU(selectOpenpai ? OPENPAI_MAX_GPU_COUNT : sys?.gpu_count || 0)
+  }, [selectOpenpai])
+
+  useEffect(() => {
+    config && setConfig(config)
+    config && config.gpu_count && form.setFieldsValue({ gpu_count: config.gpu_count })
+  }, [config])
+
+  useEffect(() => {
+    setTestingSetIds(project?.testingSets || [])
+    iterationContext && setSelectedKeywords(project?.keywords || [])
+  }, [project])
+
+  useEffect(() => {
+    setTrainSet(did)
+    form.setFieldsValue({ datasetId: did })
+  }, [did])
+
+  useEffect(() => {
+    did && getDataset({ id: did })
+  }, [did])
+
+  useEffect(() => {
+    trainDataset && !iterationContext && !fromCopy && autoSetKeywords(trainDataset?.gt?.keywords)
+    if (!trainDataset && fromCopy) {
+      setSelectedKeywords([])
+      form.setFieldsValue({ keywords: [] })
+    }
+  }, [trainDataset])
+
+  useEffect(() => {
+    const state = location.state
+
+    if (state?.record) {
+      setFromCopy(true)
+      const {
+        task: { parameters, config },
+        description,
+      } = state.record
+      const { dataset_id, validation_dataset_id, strategy, docker_image_id, model_id, model_stage_id, keywords } = parameters
+      form.setFieldsValue({
+        datasetId: dataset_id,
+        keywords: keywords,
+        testset: validation_dataset_id,
+        gpu_count: config.gpu_count,
+        modelStage: [model_id, model_stage_id],
+        image: docker_image_id,
+        strategy,
+        description,
+      })
+      if (!HIDDENMODULES.LIVECODE) {
+        setLiveCode(!!config.git_url)
+        setLiveInitialValues(config)
+      }
+      setTimeout(() => {
+        setConfig(config)
+      }, 800)
+      setTestSet(validation_dataset_id)
+      setTrainSet(dataset_id)
+      setSelectedKeywords(keywords)
+      setShowConfig(true)
+
+      history.replace({ state: {} })
+    }
+  }, [location.state])
+
+  function setAllKeywords() {
+    setSelected(trainDataset?.gt?.keywords)
+  }
+
+  function autoSetKeywords(kws = []) {
+    if (kws.length > KeywordsMaxCount) {
+      return
+    }
+    setSelected(kws)
+  }
+
+  function setSelected(kws = []) {
+    setSelectedKeywords(kws)
+    form.setFieldsValue({ keywords: kws })
+  }
+
+  function trainSetChange(value, options) {
+    setTrainSet(value)
+    setTrainDataset(options?.dataset)
+  }
+  function validationSetChange(value, option) {
+    setTestSet(value)
+    setValidationDataset(option?.dataset)
+  }
+
+  function imageChange(_, option) {
+    if (!option) {
+      setConfig({})
+    }
+    const { image, objectType } = option
+    const configObj = getConfig(image, TYPES.TRAINING, objectType)
+    if (!HIDDENMODULES.LIVECODE) {
+      setLiveCode(image.liveCode || false)
+    }
+    setConfig(configObj.config)
+  }
+
+  function setConfig(config = {}) {
+    setSeniorConfig(removeLiveCodeConfig(config))
+  }
+
+  // const onFinish = () => checkDuplicated(trainDataset, validationDataset)
+  const onFinish = () => App()
+
+  async function submit(strategy) {
+    const values = form.getFieldsValue()
+    const config = {
+      ...values.hyperparam?.reduce((prev, { key, value }) => (key !== '' && value !== '' ? { ...prev, [key]: value } : prev), {}),
+      ...(values.live || {}),
+    }
+    values.trainFormat && (config['export_format'] = values.trainFormat)
+
+    const gpuCount = form.getFieldValue('gpu_count')
+
+    config['gpu_count'] = gpuCount || 0
+
+    const params = {
+      ...values,
+      strategy,
+      name: 'group_' + randomNumber(),
+      projectId: pid,
+      keywords: iterationContext ? project?.keywords : values.keywords,
+      config,
+    }
+    const result = await train(params)
+    if (iterationContext && !iterationId) {
+      await updateProject({ id: pid, modelStage: [result.result_model?.id] })
+      return history.goBack()
+    }
+    result && ok(result)
+  }
+
+  function onFinishFailed(errorInfo) {
+    console.log('Failed:', errorInfo)
+  }
+
+  const matchKeywords = (dataset) => dataset.keywords.some((kw) => selectedKeywords.includes(kw))
+  const notTestingSet = (id) => !testingSetIds.includes(id)
+  const trainsetFilters = useCallback(
+    (datasets) =>
+      datasets.filter((ds) => {
+        const notTestSet = ds.id !== testSet
+        return notTestSet && notTestingSet(ds.id)
+      }),
+    [testSet, testingSetIds],
+  )
+
+  const validationSetFilters = useCallback(
+    (datasets) =>
+      datasets.filter((ds) => {
+        const notTrainSet = ds.id !== trainSet
+        return matchKeywords(ds) && notTrainSet && notTestingSet(ds.id)
+      }),
+    [trainSet, selectedKeywords, testingSetIds],
+  )
+
+  const getCheckedValue = (list) => list.find((item) => item.checked)['value']
+  const initialValues = {
+    name: generateName('train_model'),
+    datasetId: did ? did : undefined,
+    testset: Number(test) ? Number(test) : undefined,
+    image: image ? parseInt(image) : undefined,
+    modelStage: stage,
+    trainType: getCheckedValue(TrainType),
+    gpu_count: 1,
+  }
+  return (
+    <div>
+      <div hidden={hidden}>
+        <CheckProjectDirty style={{ marginBottom: 20, width: '100%' }} pid={pid} initialCheck={true} callback={(dirty) => setProjectDirty(dirty)} />
+      </div>
+      <Form
+        name="trainForm"
+        className={styles.form}
+        {...formLayout}
+        form={form}
+        initialValues={initialValues}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
+        <div hidden={hidden}>
+          {/* <Form.Item
+            name="image"
+            label={t('task.train.form.image.label')}
+            rules={[{ required: true, message: t('task.train.form.image.required') }]}
+            tooltip={t('tip.task.train.image')}
+          >
+            <ImageSelect placeholder={t('task.train.form.image.placeholder')} pid={pid} onChange={imageChange} />
+          </Form.Item> */}
+          <OpenpaiForm form={form} openpai={openpai} />
+          <Form.Item
+            label={t('task.train.form.trainsets.label')}
+            required
+            name="datasetId"
+            rules={[
+              {
+                required: true,
+                message: t('task.train.form.trainset.required'),
+              },
+            ]}
+          >
+            {/* <DatasetSelect pid={pid} filters={trainsetFilters} onChange={trainSetChange} /> */}
+            <Select
+                  placeholder={t('task.train.form.test.datasets.placeholder')}
+                  onChange={trainSetChange}
+                  filters={trainsetFilters}
+                  options={publicdatasets.map((dataset) => ({
+                    value: dataset.id,
+                    dataset,
+                    // label: <Dataset dataset={dataset} />,
+                    label: dataset.name
+                  }))}
+                ></Select>
+          </Form.Item>
+          {iterationContext ? (
+            <Form.Item label={t('task.train.form.keywords.label')}>
+              {project?.keywords?.map((keyword) => (
+                <Tag key={keyword}>{keyword}</Tag>
+              ))}
+            </Form.Item>
+          ) : (
+            <Form.Item
+              label={t('task.train.form.keywords.label')}
+              tooltip={t('tip.task.filter.keywords')}
+              required
+              help={
+                trainDataset && selectedKeywords.length !== trainDataset.keywords.length ? (
+                  <Button type="link" size="small" style={{ marginLeft: '-10px' }} onClick={() => setAllKeywords()}>
+                    {t('dataset.train.all.train.target')}
+                  </Button>
+                ) : null
+              }
+            >
+              <Form.Item
+                noStyle
+                name="keywords"
+                rules={[
+                  {
+                    required: true,
+                    message: t('project.add.form.keyword.required'),
+                  },
+                ]}
+              >
+                <Select
+                  mode="multiple"
+                  style={{ width: 'calc(100% - 30px)' }}
+                  showArrow
+                  allowClear
+                  placeholder={t('project.add.form.keyword.required')}
+                  disabled={!trainSet}
+                  title={trainSet ? '' : t('task.train.keywords.disabled.tip')}
+                  onChange={setSelectedKeywords}
+                  options={(trainDataset?.keywords || []).map((k) => ({
+                    label: k,
+                    value: k,
+                  }))}
+                  maxTagCount={KeywordsMaxCount}
+                  maxTagPlaceholder={
+                    <Tooltip
+                      trigger="hover"
+                      color="white"
+                      title={selectedKeywords.slice(KeywordsMaxCount).map((k) => (
+                        <Tag key={k}>{k}</Tag>
+                      ))}
+                    >
+                      {selectedKeywords.length - KeywordsMaxCount}+
+                    </Tooltip>
+                  }
+                />
+              </Form.Item>
+              <span style={{ display: trainSet ? 'inline-block' : 'none', width: 30, textAlign: 'right' }}>
+                <BarChart2LineIcon
+                  onClick={() => {
+                    showAnalysisModal()
+                  }}
+                />
+              </span>
+            </Form.Item>
+          )}
+          <Form.Item
+            label={t('task.train.form.testsets.label')}
+            name="testset"
+            rules={[
+              {
+                required: true,
+                message: t('task.train.form.testset.required'),
+              },
+            ]}
+            tooltip={t('tip.task.filter.testsets')}
+          >
+            {/* <DatasetSelect
+              pid={pid}
+              disabled={!selectedKeywords.length}
+              title={selectedKeywords.length ? '' : t('task.train.validation.disabled.tip')}
+              filters={validationSetFilters}
+              placeholder={t('task.train.form.test.datasets.placeholder')}
+              onChange={validationSetChange}
+            /> */}
+            <Select
+                  placeholder={t('task.train.form.test.datasets.placeholder')}
+                  onChange={validationSetChange}
+                  filters={trainsetFilters}
+                  options={publicdatasets.map((dataset) => ({
+                    value: dataset.id,
+                    // dataset,
+                    // label: <Dataset dataset={dataset} />,
+                    label: dataset.name
+                  }))}
+                ></Select>
+          </Form.Item>
+          {/* <Form.Item label={t('task.detail.label.premodel')} name="modelStage" tooltip={t('tip.task.train.model')}>
+            <ModelSelect placeholder={t('task.train.form.model.placeholder')} pid={pid} />
+          </Form.Item> */}
+          {/* <Form.Item hidden label={t('task.train.form.traintype.label')} name="trainType">
+            {renderRadio(TrainType)}
+          </Form.Item> */}
+
+          {/* <Form.Item label={t('task.gpu.count')} tooltip={t('tip.task.filter.gpucount')}>
+            <Form.Item
+              noStyle
+              name="gpu_count"
+              rules={[
+                {
+                  validator: (rules, value) => (value <= gpu_count ? Promise.resolve() : Promise.reject()),
+                  message: t('task.gpu.tip', { count: gpu_count }),
+                },
+              ]}
+            >
+              <InputNumber min={0} max={gpu_count} precision={0} />
+            </Form.Item>
+            <span style={{ marginLeft: 20 }}>{t('task.gpu.tip', { count: gpu_count })}</span>
+          </Form.Item> */}
+
+          <Form.Item
+                label={t('task.train.form.FL.clientchoose')}
+                name="client_num_per_round"
+                rules={[
+                  { required: true, whitespace: true},
+                  { pattern: /^[0-9]+$/, message: t('project.add.form.FL.numeric') }, 
+                  {
+                    validator: async (_, nodenum) => {
+                      if (nodenum > 10 ) {
+                        return Promise.reject(new Error(t('task.train.form.FL.lim')));
+                      }
+                    },
+                  },
+                ]}
+              >
+                <Input autoComplete="off" allowClear />
+          </Form.Item>
+          
+          <Form.Item
+                label={t('task.train.form.FL.global')}
+                name="global_round"
+                rules={[
+                  { required: true, whitespace: true},
+                  { pattern: /^[0-9]+$/, message: t('project.add.form.FL.numeric') }, 
+                ]}
+              >
+                <Input defaultValue={100} autoComplete="off" allowClear />
+          </Form.Item>
+
+          <Form.Item
+                label={t('task.train.form.FL.bathsize')}
+                name="batchsize"
+                rules={[
+                  { required: true, whitespace: true},
+                  { pattern: /^[0-9]+$/, message: t('project.add.form.FL.numeric') }, 
+                ]}
+              >
+                <Input defaultValue={100} autoComplete="off" allowClear />
+          </Form.Item>
+          
+          <Form.Item
+            label={t('task.train.form.FL.optimizer')}
+            name="optimizer"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Select
+                  placeholder={"SGD"}
+                  filters={trainsetFilters}
+                  options={optimizers.map((optimizer) => ({
+                    value: optimizer,
+                    // dataset,
+                    // label: <Dataset dataset={dataset} />,
+                    label: optimizer
+                  }))}
+                ></Select>
+          </Form.Item>
+
+          <Form.Item
+                label={t('task.train.form.FL.lr')}
+                name="lr"
+                rules={[
+                  { required: true, whitespace: true},
+                  // { pattern: /^[0-9]+$/, message: t('project.add.form.FL.numeric') }, 
+                ]}
+              >
+                <Input defaultValue={0.0001} autoComplete="off" allowClear />
+          </Form.Item>
+
+          {live ? (
+            <Form.Item label={t('task.train.export.format')} tooltip={t('tip.train.export.format')} name="trainFormat" initialValue={'ark:raw'}>
+              <TrainFormat />
+            </Form.Item>
+          ) : null}
+          <LiveCodeForm form={form} live={live} initialValues={liveInitialValues} />
+          <DockerConfigForm show={showConfig} seniorConfig={seniorConfig} form={form} />
+          <Desc form={form} />
+        </div>
+        <Form.Item wrapperCol={{ offset: 8 }}>{bottom ? bottom : <SubmitButtons label="common.action.train" taskhref="home/portal"/>}</Form.Item>
+      </Form>
+      <AnalysisModal ids={[trainSet]} classes={selectedKeywords} />
+    </div>
+  )
+}
+
+export default Train

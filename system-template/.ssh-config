@@ -1,0 +1,4 @@
+#!/bin/bash
+# SSH连接配置
+export SSH_HOST="root@144.7.14.212"
+export SSH_PASS="Bailingyun"

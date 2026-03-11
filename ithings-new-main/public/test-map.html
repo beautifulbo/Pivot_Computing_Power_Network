@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百度地图API测试页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+        .info-box {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .status {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-box">
+        <h2>🗺️ 百度地图API测试</h2>
+        <div id="status-info">
+            <div class="status info loading">正在加载百度地图...</div>
+        </div>
+        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+            <div>API密钥: bx8OZdaX5k7YViAjlf6dQJ3W7F6fpb82</div>
+            <div>地图中心: 北京 (116.404, 39.915)</div>
+            <div>缩放级别: 5</div>
+        </div>
+    </div>
+    <div id="container"></div>
+
+    <script type="text/javascript">
+        // 记录开始时间
+        const startTime = Date.now();
+        const statusDiv = document.getElementById('status-info');
+
+        function updateStatus(message, type = 'info') {
+            const loadTime = ((Date.now() - startTime) / 1000).toFixed(2);
+            statusDiv.innerHTML = `
+                <div class="status ${type}">
+                    ${message}
+                    <br><small>耗时: ${loadTime}秒</small>
+                </div>
+            `;
+        }
+
+        // 百度地图初始化回调
+        function initMap() {
+            try {
+                updateStatus('✓ 百度地图API加载成功，正在初始化地图...', 'success');
+
+                // 创建地图实例
+                const map = new BMap.Map("container");
+
+                // 设置中心点坐标 (北京)
+                const point = new BMap.Point(116.404, 39.915);
+
+                // 初始化地图，设置中心点和缩放级别
+                map.centerAndZoom(point, 5);
+
+                // 启用滚轮缩放
+                map.enableScrollWheelZoom(true);
+
+                // 添加缩放控件
+                map.addControl(new BMap.NavigationControl());
+
+                // 添加比例尺控件
+                map.addControl(new BMap.ScaleControl());
+
+                // 在中国几个城市添加标注点
+                const cities = [
+                    {name: '北京', point: new BMap.Point(116.404, 39.915)},
+                    {name: '上海', point: new BMap.Point(121.472, 31.231)},
+                    {name: '广州', point: new BMap.Point(113.264, 23.129)},
+                    {name: '深圳', point: new BMap.Point(114.057, 22.543)},
+                    {name: '成都', point: new BMap.Point(104.066, 30.572)},
+                ];
+
+                cities.forEach(city => {
+                    const marker = new BMap.Marker(city.point);
+                    map.addOverlay(marker);
+
+                    const label = new BMap.Label(city.name, {
+                        offset: new BMap.Size(20, -10)
+                    });
+                    marker.setLabel(label);
+                });
+
+                updateStatus('✓ 地图初始化完成！可以拖动、缩放地图进行测试。', 'success');
+
+                // 监听地图加载完成事件
+                map.addEventListener('tilesloaded', function() {
+                    console.log('地图瓦片加载完成');
+                });
+
+            } catch (error) {
+                updateStatus('✗ 地图初始化失败: ' + error.message, 'error');
+                console.error('地图初始化错误:', error);
+            }
+        }
+
+        // 动态加载百度地图API
+        function loadBaiduMap() {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = '//api.map.baidu.com/api?v=2.0&ak=bx8OZdaX5k7YViAjlf6dQJ3W7F6fpb82&callback=initMap';
+
+            script.onerror = function() {
+                updateStatus('✗ 百度地图API加载失败！可能是网络问题或API密钥无效。', 'error');
+                console.error('脚本加载失败');
+            };
+
+            document.head.appendChild(script);
+        }
+
+        // 页面加载完成后开始加载地图
+        window.onload = function() {
+            updateStatus('开始加载百度地图API...', 'info');
+            loadBaiduMap();
+        };
+
+        // 超时检测
+        setTimeout(function() {
+            if (!window.BMap) {
+                updateStatus('✗ 加载超时！百度地图API可能无法访问。', 'error');
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

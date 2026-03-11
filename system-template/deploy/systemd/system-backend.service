@@ -1,0 +1,25 @@
+[Unit]
+Description=System Template Backend Service
+After=network.target docker.service
+Wants=docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/system-template
+
+# Java 运行参数
+Environment="JAVA_OPTS=-Xms512m -Xmx1024m -XX:+UseG1GC"
+ExecStart=/usr/bin/java ${JAVA_OPTS} -Dspring.profiles.active=prod -jar /opt/system-template/system-springboot.jar
+
+# 自动重启配置
+Restart=on-failure
+RestartSec=10
+
+# 日志配置
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=system-template-backend
+
+[Install]
+WantedBy=multi-user.target

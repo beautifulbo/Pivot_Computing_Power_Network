@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>简单 iframe 测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        .header { background: #409eff; color: white; padding: 15px; text-align: center; }
+        .content { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .info-box { background: #ecf5ff; border-left: 4px solid #409eff; padding: 15px; }
+        .iframe-box { flex: 1; border: 2px solid #409eff; border-radius: 8px; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; display: block; }
+        .status { background: #fff3cd; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>WeBASE iframe 嵌入测试</h1>
+    </div>
+    
+    <div class="content">
+        <div class="info-box">
+            <p><strong>代理路径:</strong> /webase-proxy/</p>
+            <p><strong>Sandbox:</strong> allow-same-origin allow-scripts allow-forms allow-popups allow-modals</p>
+        </div>
+        
+        <div class="status" id="status">iframe 加载中...</div>
+        
+        <div class="iframe-box">
+            <iframe 
+                id="testFrame"
+                src="/webase-proxy/#/login?redirect=%2Fmain"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+            ></iframe>
+        </div>
+    </div>
+    
+    <script>
+        const iframe = document.getElementById('testFrame');
+        const status = document.getElementById('status');
+        
+        iframe.onload = function() {
+            status.textContent = 'iframe 已加载';
+            status.style.background = '#d4edda';
+            console.log('iframe loaded successfully');
+        };
+        
+        iframe.onerror = function(e) {
+            status.textContent = 'iframe 加载失败: ' + e;
+            status.style.background = '#f8d7da';
+            console.error('iframe error:', e);
+        };
+        
+        window.onerror = function(msg, url, line) {
+            console.error('Page error:', msg, 'at', url, line);
+        };
+        
+        console.log('Test page loaded');
+        console.log('iframe src:', iframe.src);
+    </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>API全面调试工具</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        h1 { color: #333; }
+        .section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #409EFF; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #66b1ff; }
+        pre { background: #f5f5f5; padding: 15px; overflow-x: auto; max-height: 400px; overflow-y: auto; }
+        .error { color: #F56C6C; }
+        .success { color: #67C23A; }
+        input { padding: 8px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API调试工具</h1>
+        <p>Token状态: <span id="tokenStatus">检查中...</span></p>
+
+        <div class="section">
+            <h2>角色管理测试</h2>
+            <button onclick="testUpdateRole()">测试更新角色(PUT)</button>
+            <button onclick="testGetRoles()">获取角色列表(GET)</button>
+            <div id="roleResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>用户角色测试</h2>
+            <button onclick="testUpdateUserRole()">分配角色(PUT /user-role)</button>
+            <div id="userRoleResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>用户管理测试</h2>
+            <button onclick="testDeleteUser()">删除用户(DELETE)</button>
+            <div id="userResult"></div>
+        </div>
+
+        <div class="section">
+            <h2>详细日志</h2>
+            <pre id="debugLog"></pre>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token') || '';
+        let logs = [];
+
+        function log(msg) {
+            logs.push('[' + new Date().toLocaleTimeString() + '] ' + msg);
+            document.getElementById('debugLog').textContent = logs.join('\n');
+        }
+
+        async function testUpdateRole() {
+            log('测试: PUT /role/admin/updateRole');
+            try {
+                const res = await fetch('/role/admin/updateRole', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        id: 2,
+                        roleName: "ROLE_user",
+                        roleNameZh: "普通用户",
+                        permission: [27, 28]
+                    })
+                });
+                log('状态: ' + res.status);
+                const data = await res.json();
+                log('响应: ' + JSON.stringify(data));
+                document.getElementById('roleResult').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (e) {
+                log('错误: ' + e.message);
+            }
+        }
+
+        async function testGetRoles() {
+            log('测试: GET /role/admin/getAllRoles');
+            try {
+                const res = await fetch('/role/admin/getAllRoles', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                log('状态: ' + res.status);
+                const data = await res.json();
+                log('响应: ' + JSON.stringify(data));
+                document.getElementById('roleResult').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (e) {
+                log('错误: ' + e.message);
+            }
+        }
+
+        async function testUpdateUserRole() {
+            log('测试: PUT /user-role/updateUserRole');
+            try {
+                const res = await fetch('/user-role/updateUserRole', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ id: 2, rid: 2 })
+                });
+                log('状态: ' + res.status);
+                const data = await res.json();
+                log('响应: ' + JSON.stringify(data));
+                document.getElementById('userRoleResult').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (e) {
+                log('错误: ' + e.message);
+            }
+        }
+
+        async function testDeleteUser() {
+            log('测试: DELETE /user/admin/deleteUserById/4');
+            try {
+                const res = await fetch('/user/admin/deleteUserById/4', {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                log('状态: ' + res.status);
+                const data = await res.json();
+                log('响应: ' + JSON.stringify(data));
+                document.getElementById('userResult').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (e) {
+                log('错误: ' + e.message);
+            }
+        }
+
+        window.onload = () => {
+            if (token) {
+                document.getElementById('tokenStatus').innerHTML = '<span class="success">已登录</span>';
+                log('Token已加载，可以开始测试');
+            } else {
+                document.getElementById('tokenStatus').innerHTML = '<span class="error">未登录</span>';
+                log('请先在主系统登录');
+            }
+        };
+    </script>
+</body>
+</html>

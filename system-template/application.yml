@@ -1,0 +1,84 @@
+server:
+  port: 8090
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  # HTTP消息编码配置
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  # Jackson JSON 编码配置
+  jackson:
+    default-property-inclusion: non_null
+    charset: UTF-8
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/system_template?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: root123456
+    hikari:
+      pool-name: DateHikariCP
+      minimum-idle: 5
+      maximum-pool-size: 10
+      idle-timeout: 180000
+      auto-commit: true
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  # redis配置
+  redis:
+    connect-timeout: 10000ms
+    host: 127.0.0.1
+    port: 6379
+    database: 2
+    lettuce:
+      pool:
+        max-active: 1024
+        max-wait: 10000ms
+        max-idle: 200
+        min-idle: 5
+
+# Mybatis-plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*Mapper.xml
+  type-aliases-package: com.zrkizzy.template.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# mybatis SQL打印
+logging:
+  level:
+    com.zrkizzy.template.mapper: debug
+    com.zrkizzy.template.service: info
+
+# 项目配置
+project:
+  name: system-template
+  version: 1.0.0
+  description: "云边端协同AI平台"
+
+# JWT配置
+jwt:
+  tokenHeader: Authorization
+  secret: system-secret
+  expiration: 604800  # 7天
+  tokenHead: Bearer
+
+# 文件上传路径
+file:
+  path: /opt/system-template/upload/

@@ -1,0 +1,68 @@
+# 生产环境配置文件
+# 放置路径: system-springboot/src/main/resources/config/application-prod.yml
+
+server:
+  port: 8090
+
+spring:
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/system_template?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: password
+
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6380
+    database: 2
+    password:
+    timeout: 5000
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+# 文件存储路径
+file:
+  path: /opt/system-template/uploads/
+
+# JWT配置
+jwt:
+  secret: system-template-secret-key-2024
+  expiration: 604800
+  tokenHeader: Authorization
+  tokenHead: Bearer
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.zrkizzy.template.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.zrkizzy.template: INFO
+  file:
+    path: /opt/system-template/logs
+    name: /opt/system-template/logs/system-template.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+
+# Swagger配置（生产环境建议关闭）
+swagger:
+  enable: false
