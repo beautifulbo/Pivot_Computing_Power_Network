@@ -1,0 +1,4 @@
+interface:
+  display_name: "System Code Testing"
+  short_description: "Layered repo testing with Playwright"
+  default_prompt: "Use $system-code-testing to add or update tests for this repository, choose the right layer, and add Playwright coverage for critical flows."
